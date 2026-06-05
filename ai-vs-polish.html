@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI vs Our Polish — EARS Showcase</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+/* ═══ HERO: split ink/white ═══ */
+.avp-hero {
+  display: grid; grid-template-columns: 1fr 1fr; min-height: 80vh;
+}
+.avp-hero-left {
+  background: var(--ink); padding: 120px 48px 72px;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  position: relative; overflow: hidden;
+}
+.avp-hero-left::before {
+  content: 'AI';
+  position: absolute; top: -20px; left: -20px;
+  font-family: 'Playfair Display', serif; font-size: 200px; font-weight: 900;
+  color: rgba(255,255,255,0.03); line-height: 1; pointer-events: none;
+}
+.avp-hero-right {
+  background: var(--gold-light); padding: 120px 48px 72px;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  position: relative; overflow: hidden;
+  border-left: 3px solid var(--gold);
+}
+.avp-hero-right::before {
+  content: 'US';
+  position: absolute; top: -20px; right: -10px;
+  font-family: 'Playfair Display', serif; font-size: 200px; font-weight: 900;
+  color: rgba(193,127,36,0.07); line-height: 1; pointer-events: none;
+}
+.avp-side-tag {
+  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500;
+  letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 14px;
+}
+.avp-side-tag.light { color: rgba(255,255,255,0.35); }
+.avp-side-tag.gold { color: var(--gold); }
+.avp-hero-h {
+  font-family: 'Playfair Display', serif; font-size: clamp(32px,5vw,56px);
+  font-weight: 900; line-height: 1.0; letter-spacing: -0.02em; margin-bottom: 16px;
+}
+.avp-hero-h.light { color: rgba(255,255,255,0.9); }
+.avp-hero-h.dark { color: var(--ink); }
+.avp-hero-desc { font-size: 14px; line-height: 1.75; font-weight: 300; }
+.avp-hero-desc.light { color: rgba(255,255,255,0.5); }
+.avp-hero-desc.dark { color: var(--ink3); }
+.center-divider {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  position: relative; z-index: 10;
+}
+.vs-badge {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 64px; height: 64px; border-radius: 50%;
+  background: var(--gold); color: var(--ink);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 900;
+  box-shadow: 0 0 0 6px var(--ink), 0 0 0 8px var(--gold-mid);
+  z-index: 20;
+}
+
+/* ═══ SUMMARY STRIP ═══ */
+.summary-strip {
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  padding: 32px;
+}
+.summary-inner {
+  max-width: 1100px; margin: 0 auto;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 1px;
+  background: var(--border); border-radius: 12px; overflow: hidden;
+}
+.sum-item { background: var(--surface); padding: 22px 20px; text-align: center; }
+.sum-val { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 900; color: var(--gold); line-height: 1; margin-bottom: 4px; }
+.sum-lab { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--ink4); letter-spacing: 0.1em; text-transform: uppercase; }
+
+/* ═══ COMPARISON ROWS ═══ */
+.comp-row {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 2px; background: var(--border); border-radius: 16px; overflow: hidden;
+  margin-bottom: 20px; box-shadow: var(--shadow-sm);
+}
+.comp-side { padding: 32px 28px; position: relative; }
+.comp-side.ai-side { background: var(--ink); }
+.comp-side.us-side { background: var(--surface); }
+.comp-side.us-side::before {
+  content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 3px;
+  background: linear-gradient(180deg, var(--gold), var(--gold-mid));
+}
+.comp-label {
+  font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 500;
+  letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 10px;
+  display: flex; align-items: center; gap: 7px;
+}
+.comp-label.ai { color: rgba(255,255,255,0.25); }
+.comp-label.us { color: var(--gold); }
+.comp-dot { width: 6px; height: 6px; border-radius: 50%; }
+.ai-dot { background: rgba(255,255,255,0.2); }
+.us-dot { background: var(--gold); box-shadow: 0 0 4px rgba(193,127,36,0.5); }
+.comp-title {
+  font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700;
+  margin-bottom: 10px;
+}
+.comp-title.light { color: rgba(255,255,255,0.8); }
+.comp-title.dark { color: var(--ink); }
+.comp-body { font-size: 13px; line-height: 1.75; font-weight: 300; }
+.comp-body.light { color: rgba(255,255,255,0.45); }
+.comp-body.dark { color: var(--ink3); }
+.comp-code {
+  margin-top: 14px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px; padding: 12px 14px;
+  font-family: 'DM Mono', monospace; font-size: 11px; line-height: 1.7;
+  color: rgba(255,255,255,0.55); overflow-x: auto;
+}
+.comp-code.light-code {
+  background: var(--bg); border: 1px solid var(--border); color: var(--ink3);
+}
+.comp-highlight { color: var(--gold-bright); }
+.comp-highlight-green { color: #86EFAC; }
+.comp-tag {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  border-radius: 4px; padding: 3px 9px; margin-top: 10px;
+}
+.tag-ai { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.3); }
+.tag-us { background: var(--gold-light); color: var(--gold); border: 1px solid var(--gold-mid); }
+.tag-us-green { background: var(--green-light); color: var(--green); border: 1px solid #9ECDB1; }
+
+/* ═══ CHANGE TYPE LEGEND ═══ */
+.legend-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 40px; }
+.legend-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  border-radius: 6px; padding: 5px 13px; border: 1px solid;
+}
+.lt-sec { color: var(--teal); background: var(--teal-light); border-color: #9ECECE; }
+.lt-perf { color: #6D28D9; background: #F3EFFF; border-color: #C4B5FD; }
+.lt-ux { color: var(--green); background: var(--green-light); border-color: #9ECDB1; }
+.lt-arch { color: var(--gold); background: var(--gold-light); border-color: var(--gold-mid); }
+.lt-future { color: var(--red); background: var(--red-light); border-color: #F5B9B4; }
+
+/* ═══ TIMELINE OF CHANGES ═══ */
+.timeline { position: relative; padding-left: 32px; }
+.timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 1px; background: var(--border); }
+.tl-item { position: relative; margin-bottom: 32px; }
+.tl-item::before {
+  content: ''; position: absolute; left: -28px; top: 6px;
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--gold); border: 2px solid var(--surface);
+  box-shadow: 0 0 0 2px var(--gold-mid);
+}
+.tl-sprint { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--gold); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px; }
+.tl-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+.tl-desc { font-size: 13px; color: var(--ink3); line-height: 1.7; margin-bottom: 8px; font-weight: 300; }
+.tl-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+
+/* ═══ IMPACT GRID ═══ */
+.impact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 14px; }
+.impact-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 24px;
+  box-shadow: var(--shadow-sm); position: relative; overflow: hidden;
+}
+.impact-card::after {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--gold), var(--gold-mid));
+}
+.impact-icon { font-size: 28px; margin-bottom: 14px; display: block; }
+.impact-title { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
+.impact-before { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--red); background: var(--red-light); border-radius: 4px; padding: 3px 8px; margin-bottom: 4px; display: inline-block; }
+.impact-after { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--green); background: var(--green-light); border-radius: 4px; padding: 3px 8px; display: inline-block; }
+.impact-body { font-size: 12px; color: var(--ink3); line-height: 1.6; margin-top: 8px; }
+
+/* ═══ BIG QUOTE ═══ */
+.big-quote-sec {
+  background: var(--ink); padding: 80px 32px; text-align: center;
+}
+.bq-inner { max-width: 760px; margin: 0 auto; }
+.bq-open { font-family: 'Playfair Display', serif; font-size: 80px; line-height: 0.5; color: var(--gold); opacity: .4; display: block; margin-bottom: 16px; }
+.bq-text { font-family: 'Playfair Display', serif; font-size: clamp(20px,3.5vw,32px); font-weight: 700; color: rgba(255,255,255,0.85); line-height: 1.4; margin-bottom: 24px; font-style: italic; }
+.bq-attr { font-family: 'DM Mono', monospace; font-size: 11px; color: rgba(255,255,255,0.3); letter-spacing: 0.08em; }
+
+@media(max-width:800px){
+  .avp-hero { grid-template-columns: 1fr; }
+  .avp-hero-right { border-left: none; border-top: 3px solid var(--gold); }
+  .vs-badge { display: none; }
+  .comp-row { grid-template-columns: 1fr; }
+  .avp-hero-left, .avp-hero-right { padding: 80px 24px 48px; }
+}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo"><div class="logo-badge">E</div><span class="nav-wordmark">EARS</span></a>
+  <div class="nav-links">
+    <a href="index.html">Overview</a><a href="architecture.html">Architecture</a>
+    <a href="features.html">Features</a><a href="code.html">Code</a>
+    <a href="ai-vs-polish.html" class="active">AI vs Polish</a><a href="references.html">References</a>
+    <a href="https://earsystem.netlify.app/" target="_blank" class="nav-live">↗ Live Demo</a>
+  </div>
+  <button class="nav-burger" id="burger"><span></span><span></span><span></span></button>
+</nav>
+<div class="nav-drawer" id="drawer">
+  <a href="index.html" class="drawer-lnk">Overview</a><a href="architecture.html" class="drawer-lnk">Architecture</a>
+  <a href="features.html" class="drawer-lnk">Features</a><a href="code.html" class="drawer-lnk">Code</a>
+  <a href="ai-vs-polish.html" class="drawer-lnk">AI vs Polish</a><a href="references.html" class="drawer-lnk">References</a>
+  <a href="https://earsystem.netlify.app/" target="_blank">↗ Live Demo</a>
+</div>
+
+<!-- SPLIT HERO -->
+<div class="avp-hero" style="margin-top:60px; position:relative;">
+  <div class="avp-hero-left reveal-left">
+    <div class="avp-side-tag light">What the AI gave us</div>
+    <div class="avp-hero-h light">A functional<br>starting point.</div>
+    <div class="avp-hero-desc light">The AI-generated scaffold had working CRUD, basic localStorage, and a login screen. It was a foundation — not a finished product. No security hardening, no offline capability, no sync architecture, no edge-case handling.</div>
+  </div>
+  <div style="position:relative;">
+    <div class="vs-badge">VS</div>
+  </div>
+  <div class="avp-hero-right reveal-right">
+    <div class="avp-side-tag gold">What we refined into</div>
+    <div class="avp-hero-h dark">A production-<br>ready system.</div>
+    <div class="avp-hero-desc dark">We added a full security layer, PWA certification, offline cache, Google Sheets sync architecture, a complete audit trail, XSS protection verified by external review — and achieved 100/100 on Lighthouse. That's the engineering work.</div>
+  </div>
+</div>
+
+<!-- SUMMARY STRIP -->
+<div class="summary-strip">
+  <div class="summary-inner">
+    <div class="sum-item"><div class="sum-val">6</div><div class="sum-lab">Major additions</div></div>
+    <div class="sum-item"><div class="sum-val">100</div><div class="sum-lab">Lighthouse score</div></div>
+    <div class="sum-item"><div class="sum-val">5</div><div class="sum-lab">Security rules added</div></div>
+    <div class="sum-item"><div class="sum-val">PWA</div><div class="sum-lab">Certification earned</div></div>
+    <div class="sum-item"><div class="sum-val">0</div><div class="sum-lab">W3C errors</div></div>
+  </div>
+</div>
+
+<!-- COMPARISON ROWS -->
+<section class="sec sec-alt">
+  <div class="sec-inner">
+    <div class="reveal">
+      <div class="eyebrow">Side-by-side comparison</div>
+      <h2>What changed, <em>and how</em></h2>
+      <p class="sec-lead">Each row compares the AI-generated approach against what we engineered. The difference is in the details.</p>
+      <div class="legend-row">
+        <span class="legend-tag lt-sec">🔒 Security</span>
+        <span class="legend-tag lt-perf">⚡ Performance</span>
+        <span class="legend-tag lt-ux">✦ UX Polish</span>
+        <span class="legend-tag lt-arch">🏗️ Architecture</span>
+        <span class="legend-tag lt-future">🚀 Future-ready</span>
+      </div>
+    </div>
+
+    <!-- 1: Password -->
+    <div class="comp-row reveal">
+      <div class="comp-side ai-side">
+        <div class="comp-label ai"><div class="comp-dot ai-dot"></div>AI Generated</div>
+        <div class="comp-title light">Basic password check</div>
+        <div class="comp-body light">The initial version accepted any non-empty string as a password. No complexity requirements. A user could register with "a" as their password and the system would accept it.</div>
+        <div class="comp-code">
+<span style="color:rgba(255,255,255,0.25);">// AI version</span><br>
+<span style="color:#C084FC;">if</span> (!password) {<br>
+&nbsp;&nbsp;showError(<span style="color:#86EFAC;">'Password required'</span>);<br>
+&nbsp;&nbsp;<span style="color:#C084FC;">return</span>;<br>
+}
+        </div>
+        <span class="comp-tag tag-ai">No complexity enforcement</span>
+      </div>
+      <div class="comp-side us-side">
+        <div class="comp-label us"><div class="comp-dot us-dot"></div>Our Polish</div>
+        <div class="comp-title dark">5-rule enforced validation</div>
+        <div class="comp-body dark">We implemented validatePassword() with five independent regex rules — length, uppercase, lowercase, digit, and special character. Each failure returns a specific, actionable error message.</div>
+        <div class="comp-code light-code">
+<span style="color:#6B7280;">// Our version — 5 independent checks</span><br>
+<span style="color:#1C1C1C;">if</span> (pw.length &lt; <span style="color:#C17F24;">8</span>) <span style="color:#1C1C1C;">return</span> <span style="color:#1E6B3C;">'Min 8 chars'</span>;<br>
+<span style="color:#1C1C1C;">if</span> (!/[A-Z]/.test(pw)) <span style="color:#1C1C1C;">return</span> <span style="color:#1E6B3C;">'Needs uppercase'</span>;<br>
+<span style="color:#1C1C1C;">if</span> (!/[0-9]/.test(pw)) <span style="color:#1C1C1C;">return</span> <span style="color:#1E6B3C;">'Needs a number'</span>;<br>
+<span style="color:#1C1C1C;">if</span> (!/[^A-Za-z0-9]/.test(pw)) <span style="color:#1C1C1C;">return</span> <span style="color:#1E6B3C;">'Needs special char'</span>;<br>
+<span style="color:#1C1C1C;">return</span> <span style="color:#C17F24;">null</span>; <span style="color:#6B7280;">// valid</span>
+        </div>
+        <span class="comp-tag tag-us">🔒 Security</span>
+      </div>
+    </div>
+
+    <!-- 2: XSS -->
+    <div class="comp-row reveal">
+      <div class="comp-side ai-side">
+        <div class="comp-label ai"><div class="comp-dot ai-dot"></div>AI Generated</div>
+        <div class="comp-title light">innerHTML without sanitisation</div>
+        <div class="comp-body light">User-provided data was injected directly into innerHTML in multiple places throughout the dashboard and activity list. Any user could have injected arbitrary HTML or JavaScript into the page.</div>
+        <div class="comp-code">
+<span style="color:rgba(255,255,255,0.25);">// AI version — XSS vulnerability</span><br>
+card.innerHTML = <span style="color:#86EFAC;">`&lt;h3&gt;${</span><span style="color:#FDE68A;">item.title</span><span style="color:#86EFAC;">}&lt;/h3&gt;`</span>;<br>
+<span style="color:rgba(255,255,255,0.2);">// ↑ if title = "&lt;script&gt;alert(1)&lt;/script&gt;"</span><br>
+<span style="color:rgba(255,255,255,0.2);">// → executes in browser</span>
+        </div>
+        <span class="comp-tag tag-ai">XSS vulnerability present</span>
+      </div>
+      <div class="comp-side us-side">
+        <div class="comp-label us"><div class="comp-dot us-dot"></div>Our Polish</div>
+        <div class="comp-title dark">esc() wraps every output</div>
+        <div class="comp-body dark">We created the esc() helper that HTML-encodes &amp;, &lt;, &gt;, and " before any dynamic value touches the DOM. Every single template literal uses it. Verified passing by external security reviewer.</div>
+        <div class="comp-code light-code">
+<span style="color:#6B7280;">// Our version — sanitised</span><br>
+<span style="color:#1C1C1C;">function</span> <span style="color:#1A4FA8;">esc</span>(v) {<br>
+&nbsp;&nbsp;<span style="color:#1C1C1C;">return</span> String(v || <span style="color:#1E6B3C;">''</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;.replace(/&amp;/g, <span style="color:#1E6B3C;">'&amp;amp;'</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;.replace(/&lt;/g, <span style="color:#1E6B3C;">'&amp;lt;'</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;.replace(/&gt;/g, <span style="color:#1E6B3C;">'&amp;gt;'</span>);<br>
+}<br>
+card.innerHTML = <span style="color:#1E6B3C;">`&lt;h3&gt;${</span><span style="color:#C17F24;">esc(item.title)</span><span style="color:#1E6B3C;">}&lt;/h3&gt;`</span>;
+        </div>
+        <span class="comp-tag tag-us">🔒 Security — verified externally</span>
+      </div>
+    </div>
+
+    <!-- 3: PWA -->
+    <div class="comp-row reveal">
+      <div class="comp-side ai-side">
+        <div class="comp-label ai"><div class="comp-dot ai-dot"></div>AI Generated</div>
+        <div class="comp-title light">Static website only</div>
+        <div class="comp-body light">No manifest, no service worker, no offline capability. The initial build was a regular website — close the tab and everything was gone. Reload needed a network connection. Lighthouse PWA score: 0.</div>
+        <div class="comp-code">
+<span style="color:rgba(255,255,255,0.2);">// sw.js — did not exist</span><br>
+<span style="color:rgba(255,255,255,0.2);">// manifest.json — did not exist</span><br>
+<span style="color:rgba(255,255,255,0.2);">// Offline support — none</span><br>
+<span style="color:rgba(255,255,255,0.2);">// Add to Home Screen — impossible</span>
+        </div>
+        <span class="comp-tag tag-ai">No PWA features</span>
+      </div>
+      <div class="comp-side us-side">
+        <div class="comp-label us"><div class="comp-dot us-dot"></div>Our Polish</div>
+        <div class="comp-title dark">Full PWA certification</div>
+        <div class="comp-body dark">We wrote sw.js and manifest.json from scratch. The Service Worker pre-caches all assets on install and responds to all fetch events — cache-first, network fallback. Lighthouse PWA: certified.</div>
+        <div class="comp-code light-code">
+<span style="color:#6B7280;">// sw.js — written from scratch</span><br>
+<span style="color:#1C1C1C;">const</span> <span style="color:#C17F24;">CACHE_NAME</span> = <span style="color:#1E6B3C;">'ears-v2'</span>;<br>
+self.addEventListener(<span style="color:#1E6B3C;">'install'</span>, e => {<br>
+&nbsp;&nbsp;e.waitUntil(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;caches.open(<span style="color:#C17F24;">CACHE_NAME</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.then(c => c.addAll(urlsToCache))<br>
+&nbsp;&nbsp;);<br>
+});
+        </div>
+        <span class="comp-tag tag-us">⚡ Performance + PWA certified</span>
+      </div>
+    </div>
+
+    <!-- 4: DB abstraction -->
+    <div class="comp-row reveal">
+      <div class="comp-side ai-side">
+        <div class="comp-label ai"><div class="comp-dot ai-dot"></div>AI Generated</div>
+        <div class="comp-title light">Scattered localStorage calls</div>
+        <div class="comp-body light">localStorage.getItem() and setItem() were scattered across 20+ functions. No consistent key naming, no JSON parse/stringify wrapper, and no null safety — crashes when a key didn't exist yet.</div>
+        <div class="comp-code">
+<span style="color:rgba(255,255,255,0.25);">// AI — localStorage scattered everywhere</span><br>
+<span style="color:#C084FC;">const</span> data = localStorage.getItem(<span style="color:#86EFAC;">'activities'</span>);<br>
+<span style="color:#C084FC;">const</span> acts = JSON.parse(data);<br>
+<span style="color:rgba(255,255,255,0.3);">// ↑ crashes if 'activities' is null</span>
+        </div>
+        <span class="comp-tag tag-ai">No abstraction layer</span>
+      </div>
+      <div class="comp-side us-side">
+        <div class="comp-label us"><div class="comp-dot us-dot"></div>Our Polish</div>
+        <div class="comp-title dark">DB object — clean data API</div>
+        <div class="comp-body dark">We designed a DB object that wraps all localStorage access, handles JSON parse/stringify, namespaces all keys with 'ears3_', provides typed accessors with safe defaults, and includes an auto-incrementing ID system.</div>
+        <div class="comp-code light-code">
+<span style="color:#6B7280;">// Our DB — single abstraction layer</span><br>
+<span style="color:#1C1C1C;">const</span> <span style="color:#C17F24;">DB</span> = {<br>
+&nbsp;&nbsp;get: k => JSON.parse(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;localStorage.getItem(<span style="color:#1E6B3C;">'ears3_'</span>+k) || <span style="color:#1E6B3C;">'null'</span><br>
+&nbsp;&nbsp;),<br>
+&nbsp;&nbsp;acts: () => DB.get(<span style="color:#1E6B3C;">'acts'</span>) || [],  <span style="color:#6B7280;">// safe</span><br>
+&nbsp;&nbsp;nextId: key => { ... }  <span style="color:#6B7280;">// auto-inc</span><br>
+};
+        </div>
+        <span class="comp-tag tag-us">🏗️ Architecture — migration-ready</span>
+      </div>
+    </div>
+
+    <!-- 5: Google Sheets -->
+    <div class="comp-row reveal">
+      <div class="comp-side ai-side">
+        <div class="comp-label ai"><div class="comp-dot ai-dot"></div>AI Generated</div>
+        <div class="comp-title light">localStorage only, no export</div>
+        <div class="comp-body light">Data was entirely locked inside the browser. No export functionality, no backup mechanism, no external sync. If a user cleared their browser storage, all data was permanently lost with no recovery path.</div>
+        <div class="comp-code">
+<span style="color:rgba(255,255,255,0.2);">// AI version</span><br>
+<span style="color:rgba(255,255,255,0.2);">// No sync function</span><br>
+<span style="color:rgba(255,255,255,0.2);">// No export function</span><br>
+<span style="color:rgba(255,255,255,0.2);">// No backup mechanism</span><br>
+<span style="color:rgba(255,255,255,0.2);">// Data recovery: impossible</span>
+        </div>
+        <span class="comp-tag tag-ai">Data trapped in browser</span>
+      </div>
+      <div class="comp-side us-side">
+        <div class="comp-label us"><div class="comp-dot us-dot"></div>Our Polish</div>
+        <div class="comp-title dark">Sync pipeline + JSON backup</div>
+        <div class="comp-body dark">We engineered a full Google Sheets sync pipeline (dormant until configured) and a complete JSON export/import system with intelligent merge logic. Data is always portable and recoverable.</div>
+        <div class="comp-code light-code">
+<span style="color:#6B7280;">// Google Sheets sync — written & ready</span><br>
+<span style="color:#1C1C1C;">async function</span> <span style="color:#1A4FA8;">syncToGoogleSheets</span>() {<br>
+&nbsp;&nbsp;<span style="color:#1C1C1C;">if</span> (!DB.get(<span style="color:#1E6B3C;">'googleScriptUrl'</span>)) <span style="color:#1C1C1C;">return</span>;<br>
+&nbsp;&nbsp;<span style="color:#6B7280;">// Full pipeline active when URL set</span><br>
+}<br>
+<span style="color:#6B7280;">// + exportDataAsJSON() for backups</span>
+        </div>
+        <span class="comp-tag tag-us">🚀 Future-ready sync architecture</span>
+      </div>
+    </div>
+
+    <!-- 6: Audit -->
+    <div class="comp-row reveal">
+      <div class="comp-side ai-side">
+        <div class="comp-label ai"><div class="comp-dot ai-dot"></div>AI Generated</div>
+        <div class="comp-title light">No audit trail</div>
+        <div class="comp-body light">No logging of any user actions. No record of who logged in, who created which activity, or when anything changed. An admin had no way to review system history or investigate discrepancies.</div>
+        <div class="comp-code">
+<span style="color:rgba(255,255,255,0.2);">// AI version</span><br>
+<span style="color:#C084FC;">function</span> <span style="color:#93C5FD;">saveActivity</span>(data) {<br>
+&nbsp;&nbsp;<span style="color:#C084FC;">const</span> acts = getActivities();<br>
+&nbsp;&nbsp;acts.push(data);<br>
+&nbsp;&nbsp;localStorage.setItem(<span style="color:#86EFAC;">'acts'</span>, JSON.stringify(acts));<br>
+&nbsp;&nbsp;<span style="color:rgba(255,255,255,0.2);">// no audit log written</span><br>
+}
+        </div>
+        <span class="comp-tag tag-ai">No audit trail</span>
+      </div>
+      <div class="comp-side us-side">
+        <div class="comp-label us"><div class="comp-dot us-dot"></div>Our Polish</div>
+        <div class="comp-title dark">Full audit log system</div>
+        <div class="comp-body dark">We added addAudit() called on every significant action — login, logout, register, activity create/update/delete, admin actions. The log is capped at 200 entries and visible to admins in the admin panel.</div>
+        <div class="comp-code light-code">
+<span style="color:#6B7280;">// Our version — every action logged</span><br>
+<span style="color:#1C1C1C;">function</span> <span style="color:#1A4FA8;">addAudit</span>(action, details) {<br>
+&nbsp;&nbsp;<span style="color:#1C1C1C;">const</span> logs = DB.audit();<br>
+&nbsp;&nbsp;logs.unshift({ id, at: nowIso(),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;actor: currentUser().email,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;action, details });<br>
+&nbsp;&nbsp;DB.saveAudit(logs.slice(<span style="color:#C17F24;">0</span>, <span style="color:#C17F24;">200</span>));<span style="color:#6B7280;"> // capped</span><br>
+}
+        </div>
+        <span class="comp-tag tag-us-green">✦ UX Polish + accountability</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- TIMELINE OF CHANGES -->
+<section class="sec">
+  <div class="sec-inner">
+    <div class="reveal">
+      <div class="eyebrow">Development journey</div>
+      <h2>When we made <em>each change</em></h2>
+      <p class="sec-lead">Our polishing work happened across four sprints — each sprint tackling a different layer of quality.</p>
+    </div>
+    <div class="timeline reveal">
+      <div class="tl-item">
+        <div class="tl-sprint">Sprint 1 — Foundation</div>
+        <div class="tl-title">AI scaffold → working CRUD</div>
+        <div class="tl-desc">Started with the AI-generated base. Established the DB abstraction layer, fixed localStorage key naming, added safe defaults throughout, and implemented the auto-incrementing ID system. This sprint was about making the data layer trustworthy.</div>
+        <div class="tl-tags"><span class="legend-tag lt-arch" style="font-size:9px;padding:3px 9px;">Architecture</span></div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-sprint">Sprint 2 — Security</div>
+        <div class="tl-title">Password policy + XSS protection</div>
+        <div class="tl-desc">Added validatePassword() with five rules, validateEmail() with RFC compliance, and esc() for XSS sanitisation across all DOM outputs. Added role-based route guards (isAdmin()) and session management. External reviewer later confirmed XSS protection was effective.</div>
+        <div class="tl-tags"><span class="legend-tag lt-sec" style="font-size:9px;padding:3px 9px;">Security</span></div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-sprint">Sprint 3 — PWA + Performance</div>
+        <div class="tl-title">Service Worker + manifest + cache strategy</div>
+        <div class="tl-desc">Wrote sw.js and manifest.json from scratch. Defined the cache-first fetch strategy, implemented the versioned cache key system, and integrated Service Worker registration into boot(). Achieved 100/100 Lighthouse performance score and PWA certification.</div>
+        <div class="tl-tags"><span class="legend-tag lt-perf" style="font-size:9px;padding:3px 9px;">Performance</span><span class="legend-tag lt-future" style="font-size:9px;padding:3px 9px;">Future-ready</span></div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-sprint">Sprint 4 — Export + Sync Architecture</div>
+        <div class="tl-title">Google Sheets pipeline + JSON backup</div>
+        <div class="tl-desc">Engineered the full Google Sheets sync pipeline (with guard clauses, incremental sync, and merge logic), JSON export with password redaction, and intelligent import with conflict resolution. Added the audit log system. Achieved 0 W3C validation errors.</div>
+        <div class="tl-tags"><span class="legend-tag lt-future" style="font-size:9px;padding:3px 9px;">Future-ready</span><span class="legend-tag lt-ux" style="font-size:9px;padding:3px 9px;">UX Polish</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- IMPACT GRID -->
+<section class="sec sec-alt">
+  <div class="sec-inner">
+    <div class="reveal">
+      <div class="eyebrow">The impact</div>
+      <h2>Before vs after, <em>in numbers</em></h2>
+    </div>
+    <div class="impact-grid reveal">
+      <div class="impact-card">
+        <span class="impact-icon">🔒</span>
+        <div class="impact-title">Password Security</div>
+        <div class="impact-before">Before: any string accepted</div>
+        <div class="impact-after">After: 5-rule enforcement</div>
+        <div class="impact-body">Registration now requires uppercase, lowercase, digit, and special character — plus minimum length.</div>
+      </div>
+      <div class="impact-card">
+        <span class="impact-icon">🛡️</span>
+        <div class="impact-title">XSS Protection</div>
+        <div class="impact-before">Before: 0 inputs sanitised</div>
+        <div class="impact-after">After: 100% outputs escaped</div>
+        <div class="impact-body">Every dynamic value passes through esc() before touching the DOM. Injection attempts correctly blocked.</div>
+      </div>
+      <div class="impact-card">
+        <span class="impact-icon">📶</span>
+        <div class="impact-title">Offline Capability</div>
+        <div class="impact-before">Before: requires internet</div>
+        <div class="impact-after">After: fully offline-capable</div>
+        <div class="impact-body">Service Worker pre-caches all assets. App loads and functions with zero network connectivity after first visit.</div>
+      </div>
+      <div class="impact-card">
+        <span class="impact-icon">⚡</span>
+        <div class="impact-title">Lighthouse Score</div>
+        <div class="impact-before">Before: not measured</div>
+        <div class="impact-after">After: 100 / 100</div>
+        <div class="impact-body">Performance, Best Practices, and SEO all at perfect score. PWA certification on desktop.</div>
+      </div>
+      <div class="impact-card">
+        <span class="impact-icon">🔄</span>
+        <div class="impact-title">Data Portability</div>
+        <div class="impact-before">Before: locked in browser</div>
+        <div class="impact-after">After: portable + syncable</div>
+        <div class="impact-body">JSON export/import for backups. Google Sheets sync pipeline ready to activate with one URL.</div>
+      </div>
+      <div class="impact-card">
+        <span class="impact-icon">📋</span>
+        <div class="impact-title">Accountability</div>
+        <div class="impact-before">Before: no history</div>
+        <div class="impact-after">After: full audit trail</div>
+        <div class="impact-body">Every login, logout, and data change logged with timestamp and actor. Visible to admins. Capped at 200 entries.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BIG QUOTE -->
+<div class="big-quote-sec">
+  <div class="bq-inner">
+    <span class="bq-open">"</span>
+    <div class="bq-text">This is strong work, well above what I usually see at capstone stage. The system scored 100/100 on Lighthouse and zero errors on W3C — both uncommon for a hand-written application of this size. XSS protection was tested and correctly blocked.</div>
+    <div class="bq-attr">— Michael Borck, External Reviewer · Curtin University · 13 May 2026</div>
+  </div>
+</div>
+
+<footer>
+  <div class="f-logo"><div class="f-logo-badge">E</div><span class="f-wordmark">EARS</span></div>
+  <div class="f-meta">ISYS3002 · Curtin University · 2026</div>
+  <div class="f-links"><a href="index.html">Overview</a><a href="architecture.html">Architecture</a><a href="features.html">Features</a><a href="code.html">Code</a><a href="references.html">References</a></div>
+</footer>
+<script>
+const io=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target);}}),{threshold:.05});
+document.querySelectorAll('.reveal,.reveal-left,.reveal-right').forEach(el=>io.observe(el));
+const burger=document.getElementById('burger'),drawer=document.getElementById('drawer');
+burger.addEventListener('click',()=>{burger.classList.toggle('open');drawer.classList.toggle('open');});
+document.querySelectorAll('.drawer-lnk').forEach(a=>a.addEventListener('click',()=>{burger.classList.remove('open');drawer.classList.remove('open');}));
+</script>
+</body>
+</html>

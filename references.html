@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>References & Results — EARS Showcase</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+/* SCORE CARDS */
+.score-banner {
+  background: var(--ink); padding: 64px 32px;
+}
+.score-inner { max-width: 1100px; margin: 0 auto; }
+.score-headline { font-family: 'Playfair Display', serif; font-size: clamp(28px,4vw,44px); font-weight: 900; color: rgba(255,255,255,0.9); letter-spacing: -0.02em; margin-bottom: 40px; }
+.score-headline em { color: var(--gold-bright); font-style: italic; }
+.score-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); gap: 12px; }
+.score-card {
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 14px; padding: 24px 18px; text-align: center;
+}
+.score-card.gold { border-color: rgba(193,127,36,0.4); background: rgba(193,127,36,0.07); }
+.score-val { font-family: 'Playfair Display', serif; font-size: 40px; font-weight: 900; color: var(--gold-bright); line-height: 1; margin-bottom: 6px; }
+.score-val.teal { color: #4EC9C6; }
+.score-lab { font-family: 'DM Mono', monospace; font-size: 9px; color: rgba(255,255,255,0.35); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 3px; }
+.score-sub { font-size: 10px; color: rgba(255,255,255,0.2); font-family: 'DM Mono', monospace; }
+
+/* LH BARS */
+.lh-section { padding: 48px 32px; background: var(--surface); }
+.lh-inner { max-width: 1100px; margin: 0 auto; }
+.lh-title { font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); margin-bottom: 28px; display: flex; align-items: center; gap: 8px; }
+.lh-title::before { content:''; width:20px; height:1px; background:var(--gold); }
+.lh-bars { display: flex; flex-direction: column; gap: 14px; max-width: 640px; }
+.lh-row { display: flex; align-items: center; gap: 16px; }
+.lh-label { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--ink3); width: 180px; flex-shrink: 0; }
+.lh-track { flex: 1; height: 10px; background: var(--bg); border-radius: 100px; overflow: hidden; }
+.lh-fill { height: 100%; border-radius: 100px; width: 0%; transition: width 1.2s cubic-bezier(.22,1,.36,1); }
+.lh-val { font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 500; width: 36px; text-align: right; }
+
+/* REVIEWERS */
+.reviewer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap: 16px; margin-bottom: 48px; }
+.rv-card { border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-md); }
+.rv-card-header { padding: 24px; }
+.rv-card-header.gold { background: var(--gold); }
+.rv-card-header.ink { background: var(--ink); }
+.rv-card-header.cream { background: var(--gold-light); border-bottom: 1px solid var(--gold-mid); }
+.rv-role { font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 6px; }
+.rv-role.on-gold { color: rgba(0,0,0,0.5); }
+.rv-role.on-ink { color: rgba(255,255,255,0.35); }
+.rv-role.on-cream { color: var(--gold); }
+.rv-name { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 900; }
+.rv-name.on-gold { color: var(--ink); }
+.rv-name.on-ink { color: rgba(255,255,255,0.85); }
+.rv-name.on-cream { color: var(--ink); }
+.rv-body { padding: 22px 24px; background: var(--surface); }
+.rv-quote { font-size: 13px; color: var(--ink2); line-height: 1.75; font-style: italic; margin-bottom: 12px; font-weight: 300; }
+.rv-meta { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--ink4); }
+.rv-result { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--teal); margin-top: 10px; }
+
+/* REFERENCES */
+.ref-list { display: flex; flex-direction: column; gap: 0; }
+.ref-item { display: flex; gap: 20px; padding: 22px 0; border-bottom: 1px solid var(--border); }
+.ref-item:last-child { border-bottom: none; }
+.ref-num { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 900; color: var(--gold); opacity: .4; width: 28px; flex-shrink: 0; line-height: 1; padding-top: 2px; }
+.ref-body { flex: 1; }
+.ref-title { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 5px; }
+.ref-cite { font-size: 13px; color: var(--ink3); line-height: 1.7; font-weight: 300; }
+.ref-tag { display: inline-block; margin-top: 7px; font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 500; padding: 2px 9px; border-radius: 4px; background: var(--gold-light); color: var(--gold); border: 1px solid var(--gold-mid); letter-spacing: 0.06em; text-transform: uppercase; }
+
+/* TEAM */
+.team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 12px; margin-bottom: 32px; }
+.team-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 22px; display: flex; align-items: center; gap: 14px; box-shadow: var(--shadow-sm); }
+.av { width: 46px; height: 46px; border-radius: 10px; background: var(--gold-light); border: 1px solid var(--gold-mid); display: flex; align-items: center; justify-content: center; font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500; color: var(--gold); flex-shrink: 0; }
+.tc-name { font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 3px; }
+.tc-role { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--ink4); }
+.stakeholders { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 12px; }
+.sk-card { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
+.sk-label { font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink4); margin-bottom: 5px; }
+.sk-name { font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+.sk-email { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--ink4); }
+
+/* CTA */
+.cta-strip { background: var(--gold); padding: 72px 32px; text-align: center; }
+.cta-inner { max-width: 520px; margin: 0 auto; }
+.cta-h { font-family: 'Playfair Display', serif; font-size: clamp(28px,5vw,48px); font-weight: 900; color: var(--ink); letter-spacing: -0.02em; margin-bottom: 14px; }
+.cta-p { font-size: 15px; color: rgba(20,18,16,0.6); margin-bottom: 32px; line-height: 1.7; font-weight: 300; }
+.cta-btn { display: inline-flex; align-items: center; gap: 8px; background: var(--ink); color: var(--gold-bright); font-size: 14px; font-weight: 600; padding: 14px 32px; border-radius: 100px; text-decoration: none; font-family: 'Syne',sans-serif; transition: opacity .2s; }
+.cta-btn:hover { opacity: .85; }
+
+@media(max-width:700px){ .lh-label{width:120px;font-size:10px;} }
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo"><div class="logo-badge">E</div><span class="nav-wordmark">EARS</span></a>
+  <div class="nav-links">
+    <a href="index.html">Overview</a><a href="architecture.html">Architecture</a>
+    <a href="features.html">Features</a><a href="code.html">Code</a>
+    <a href="ai-vs-polish.html">AI vs Polish</a><a href="references.html" class="active">References</a>
+    <a href="https://earsystem.netlify.app/" target="_blank" class="nav-live">↗ Live Demo</a>
+  </div>
+  <button class="nav-burger" id="burger"><span></span><span></span><span></span></button>
+</nav>
+<div class="nav-drawer" id="drawer">
+  <a href="index.html" class="drawer-lnk">Overview</a><a href="architecture.html" class="drawer-lnk">Architecture</a>
+  <a href="features.html" class="drawer-lnk">Features</a><a href="code.html" class="drawer-lnk">Code</a>
+  <a href="ai-vs-polish.html" class="drawer-lnk">AI vs Polish</a><a href="references.html" class="drawer-lnk">References</a>
+  <a href="https://earsystem.netlify.app/" target="_blank">↗ Live Demo</a>
+</div>
+
+<!-- SCORE BANNER -->
+<div class="score-banner" style="margin-top:60px;">
+  <div class="score-inner reveal">
+    <div class="score-headline">The numbers.<br><em>All of them.</em></div>
+    <div class="score-grid">
+      <div class="score-card gold"><div class="score-val">100</div><div class="score-lab">Lighthouse Performance</div><div class="score-sub">Desktop · verified</div></div>
+      <div class="score-card gold"><div class="score-val">100</div><div class="score-lab">Best Practices</div><div class="score-sub">Lighthouse</div></div>
+      <div class="score-card gold"><div class="score-val">100</div><div class="score-lab">SEO Score</div><div class="score-sub">Lighthouse</div></div>
+      <div class="score-card gold"><div class="score-val">0</div><div class="score-lab">W3C Errors</div><div class="score-sub">Validated HTML</div></div>
+      <div class="score-card"><div class="score-val teal">93%</div><div class="score-lab">Test Pass Rate</div><div class="score-sub">28 / 30 cases</div></div>
+      <div class="score-card"><div class="score-val teal">72</div><div class="score-lab">Mobile Accessibility</div><div class="score-sub">Improvement planned</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- LIGHTHOUSE BARS -->
+<div class="lh-section">
+  <div class="lh-inner">
+    <div class="lh-title">Lighthouse audit breakdown</div>
+    <div class="lh-bars" id="lh-bars">
+      <div class="lh-row"><span class="lh-label">Performance · desktop</span><div class="lh-track"><div class="lh-fill" data-val="100" style="background:#22C55E;"></div></div><span class="lh-val" style="color:#22C55E;">100</span></div>
+      <div class="lh-row"><span class="lh-label">Accessibility · desktop</span><div class="lh-track"><div class="lh-fill" data-val="95" style="background:#22C55E;"></div></div><span class="lh-val" style="color:#22C55E;">95</span></div>
+      <div class="lh-row"><span class="lh-label">Best Practices</span><div class="lh-track"><div class="lh-fill" data-val="100" style="background:#22C55E;"></div></div><span class="lh-val" style="color:#22C55E;">100</span></div>
+      <div class="lh-row"><span class="lh-label">SEO</span><div class="lh-track"><div class="lh-fill" data-val="100" style="background:#22C55E;"></div></div><span class="lh-val" style="color:#22C55E;">100</span></div>
+      <div class="lh-row"><span class="lh-label">Accessibility · mobile</span><div class="lh-track"><div class="lh-fill" data-val="72" style="background:#F59E0B;"></div></div><span class="lh-val" style="color:#F59E0B;">72</span></div>
+    </div>
+    <div style="font-size:12px;color:var(--ink4);margin-top:14px;font-family:'DM Mono',monospace;">Mobile accessibility score flagged — improving assistive technology support is planned for next phase.</div>
+  </div>
+</div>
+
+<!-- REVIEWERS -->
+<section class="sec sec-alt">
+  <div class="sec-inner">
+    <div class="reveal">
+      <div class="eyebrow">Reviewer feedback</div>
+      <h2>What the reviewers <em>said</em></h2>
+      <p class="sec-lead">Three independent reviews across five test sessions — login, recording, offline behaviour, security, and mobile.</p>
+    </div>
+    <div class="reviewer-grid reveal">
+      <div class="rv-card">
+        <div class="rv-card-header gold"><div class="rv-role on-gold">External Reviewer</div><div class="rv-name on-gold">Michael Borck</div></div>
+        <div class="rv-body"><div class="rv-quote">"This is strong work, well above what I usually see at capstone stage. The system scored 100/100 on Lighthouse and zero errors on W3C — both uncommon for a hand-written application of this size. XSS protection was tested and correctly blocked."</div><div class="rv-meta">michael.borck@curtin.edu.au · 13 May 2026</div></div>
+      </div>
+      <div class="rv-card">
+        <div class="rv-card-header ink"><div class="rv-role on-ink">Quality Manager</div><div class="rv-name on-ink">Ishaq Rind</div></div>
+        <div class="rv-body"><div class="rv-quote">30 test cases across 5 sessions (7–11 May 2026). Coverage: login, activity recording, filtering, timeline, admin, export/import, offline, XSS injection, mobile responsiveness.</div><div class="rv-result">28 / 30 passed · 93% pass rate</div><div class="rv-meta" style="margin-top:8px;">2 minor failures in edge-case date filtering — logged for next sprint</div></div>
+      </div>
+      <div class="rv-card">
+        <div class="rv-card-header cream"><div class="rv-role on-cream">Project Supervisor</div><div class="rv-name on-cream">Dr Noal Atkinson</div></div>
+        <div class="rv-body"><div class="rv-quote">"I have given it a go. I tried to enter different dates and figures. It looks good."</div><div class="rv-meta" style="margin-top:12px;">n.atkinson@curtin.edu.au · Reviewed live prototype · core features confirmed working</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REFERENCES -->
+<section class="sec">
+  <div class="sec-inner">
+    <div class="reveal">
+      <div class="eyebrow">Academic references — Appendix K</div>
+      <h2>Sources that <em>informed</em> EARS</h2>
+      <p class="sec-lead">Standards and research that underpinned our design decisions — from PWA specs to accessibility guidelines and security practices.</p>
+    </div>
+    <div class="ref-list reveal">
+      <div class="ref-item"><span class="ref-num">01</span><div class="ref-body"><div class="ref-title">Progressive Web Apps — Web.dev</div><div class="ref-cite">Google Developers (2024). <em>Progressive Web Apps.</em> web.dev/progressive-web-apps. Foundational guidance for Service Worker implementation, Web App Manifests and offline-first architecture — used directly in sw.js and manifest.json.</div><span class="ref-tag">PWA · SERVICE WORKER</span></div></div>
+      <div class="ref-item"><span class="ref-num">02</span><div class="ref-body"><div class="ref-title">Service Worker API — MDN Web Docs</div><div class="ref-cite">Mozilla Developer Network (2024). <em>Service Worker API.</em> developer.mozilla.org. Used to understand install, activate, and fetch event lifecycle — directly reflected in sw.js event handler design.</div><span class="ref-tag">SERVICE WORKER · CACHE API</span></div></div>
+      <div class="ref-item"><span class="ref-num">03</span><div class="ref-body"><div class="ref-title">Web Application Manifest — W3C Specification</div><div class="ref-cite">W3C (2023). <em>Web Application Manifest.</em> w3.org/TR/appmanifest. Guided manifest.json — name, short_name, display: standalone, icons, and theme_color fields.</div><span class="ref-tag">PWA · MANIFEST</span></div></div>
+      <div class="ref-item"><span class="ref-num">04</span><div class="ref-body"><div class="ref-title">OWASP — XSS Prevention Cheat Sheet</div><div class="ref-cite">OWASP Foundation (2024). <em>Cross Site Scripting Prevention Cheat Sheet.</em> cheatsheetseries.owasp.org. Informed the esc() sanitisation function — encoding &amp;, &lt;, &gt;, and &quot; in all dynamically rendered user content.</div><span class="ref-tag">SECURITY · XSS</span></div></div>
+      <div class="ref-item"><span class="ref-num">05</span><div class="ref-body"><div class="ref-title">Web Content Accessibility Guidelines (WCAG) 2.1</div><div class="ref-cite">W3C (2018). <em>WCAG 2.1.</em> w3.org/TR/WCAG21. Guided semantic HTML, contrast ratios, and ARIA considerations. The 72/100 mobile score represents a target for improvement in line with these guidelines.</div><span class="ref-tag">ACCESSIBILITY · WCAG</span></div></div>
+      <div class="ref-item"><span class="ref-num">06</span><div class="ref-body"><div class="ref-title">localStorage API — MDN Web Docs</div><div class="ref-cite">Mozilla Developer Network (2024). <em>Window.localStorage.</em> developer.mozilla.org. Informed the DB abstraction layer — JSON serialisation patterns, storage limits, and the namespacing strategy.</div><span class="ref-tag">DATA LAYER · STORAGE</span></div></div>
+      <div class="ref-item"><span class="ref-num">07</span><div class="ref-body"><div class="ref-title">Google Lighthouse — Performance Auditing</div><div class="ref-cite">Google Chrome Developers (2024). <em>Lighthouse.</em> developer.chrome.com/docs/lighthouse. Primary automated quality tool. EARS achieved 100/100 on Performance, Best Practices and SEO on desktop.</div><span class="ref-tag">QUALITY · PERFORMANCE</span></div></div>
+      <div class="ref-item"><span class="ref-num">08</span><div class="ref-body"><div class="ref-title">Google Apps Script — Web Apps Documentation</div><div class="ref-cite">Google Developers (2024). <em>Google Apps Script: Web Apps.</em> developers.google.com/apps-script/guides/web. Informed the Sheets sync architecture — doPost() endpoint design, CORS handling, and JSON response format expected by syncToGoogleSheets().</div><span class="ref-tag">GOOGLE SHEETS · SYNC</span></div></div>
+      <div class="ref-item"><span class="ref-num">09</span><div class="ref-body"><div class="ref-title">Fetch API — MDN Web Docs</div><div class="ref-cite">Mozilla Developer Network (2024). <em>Fetch API.</em> developer.mozilla.org. Used for the Google Sheets sync — async/await fetch with POST, JSON headers, and error handling that preserves UX on failure.</div><span class="ref-tag">FETCH · ASYNC</span></div></div>
+      <div class="ref-item"><span class="ref-num">10</span><div class="ref-body"><div class="ref-title">Blob API and File Download — MDN Web Docs</div><div class="ref-cite">Mozilla Developer Network (2024). <em>Blob, URL.createObjectURL().</em> developer.mozilla.org. The technique behind exportDataAsJSON() — creating a downloadable file from in-memory data without a server.</div><span class="ref-tag">DATA EXPORT · BLOB</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section class="sec sec-alt">
+  <div class="sec-inner">
+    <div class="reveal">
+      <div class="eyebrow">The team</div>
+      <h2>Built by <em>four</em> students.</h2>
+      <p class="sec-lead">Faculty of Business and Law · School of Management and Marketing · Curtin University, Bentley Perth Campus</p>
+    </div>
+    <div class="team-grid reveal">
+      <div class="team-card"><div class="av">AM</div><div><div class="tc-name">Arjan Mallik</div><div class="tc-role">Team Leader</div></div></div>
+      <div class="team-card"><div class="av">SS</div><div><div class="tc-name">Sufian Sayed</div><div class="tc-role">Scrum Master & Comms</div></div></div>
+      <div class="team-card"><div class="av">IR</div><div><div class="tc-name">Ishaq Rind</div><div class="tc-role">Quality Manager</div></div></div>
+      <div class="team-card"><div class="av">DK</div><div><div class="tc-name">Dinesh Kumar</div><div class="tc-role">Documentation Manager</div></div></div>
+    </div>
+    <div class="stakeholders reveal">
+      <div class="sk-card"><div class="sk-label">Client</div><div class="sk-name">Maka Siwale</div></div>
+      <div class="sk-card"><div class="sk-label">Project Supervisor</div><div class="sk-name">Dr Noal Atkinson</div><div class="sk-email">n.atkinson@curtin.edu.au</div></div>
+      <div class="sk-card"><div class="sk-label">External Quality Reviewer</div><div class="sk-name">Michael Borck</div><div class="sk-email">michael.borck@curtin.edu.au</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<div class="cta-strip">
+  <div class="cta-inner">
+    <div class="cta-h">See EARS in action</div>
+    <p class="cta-p">A demo account is ready. No setup required. Try the live system at earsystem.netlify.app</p>
+    <a href="https://earsystem.netlify.app/" target="_blank" class="cta-btn">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+      Visit EARS Live
+    </a>
+  </div>
+</div>
+
+<footer>
+  <div class="f-logo"><div class="f-logo-badge">E</div><span class="f-wordmark">EARS</span></div>
+  <div class="f-meta">ISYS3002 · Curtin University · 2026</div>
+  <div class="f-links"><a href="index.html">Overview</a><a href="architecture.html">Architecture</a><a href="features.html">Features</a><a href="code.html">Code</a><a href="ai-vs-polish.html">AI vs Polish</a></div>
+</footer>
+<script>
+const io=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target);}}),{threshold:.06});
+document.querySelectorAll('.reveal,.reveal-left,.reveal-right').forEach(el=>io.observe(el));
+const lhBars=document.getElementById('lh-bars');
+if(lhBars){const bo=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){setTimeout(()=>{document.querySelectorAll('.lh-fill').forEach(b=>{b.style.width=b.dataset.val+'%';});},200);bo.unobserve(e.target);}});},{threshold:.4});bo.observe(lhBars);}
+const burger=document.getElementById('burger'),drawer=document.getElementById('drawer');
+burger.addEventListener('click',()=>{burger.classList.toggle('open');drawer.classList.toggle('open');});
+document.querySelectorAll('.drawer-lnk').forEach(a=>a.addEventListener('click',()=>{burger.classList.remove('open');drawer.classList.remove('open');}));
+</script>
+</body>
+</html>

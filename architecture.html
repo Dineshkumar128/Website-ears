@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Architecture — EARS Showcase</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+/* ARCH DIAGRAM */
+.arch-canvas {
+  background: var(--ink); border-radius: 20px;
+  padding: 40px 32px; margin-bottom: 48px;
+  box-shadow: var(--shadow-lg); position: relative; overflow: hidden;
+}
+.arch-canvas::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(193,127,36,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(193,127,36,0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+.arch-row-label {
+  font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 500;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: rgba(255,255,255,0.25); width: 80px; flex-shrink: 0;
+  padding-top: 6px;
+}
+.arch-layer { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 8px; }
+.arch-boxes { display: flex; gap: 8px; flex: 1; flex-wrap: wrap; }
+.abox {
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px; padding: 14px 18px; flex: 1; min-width: 100px;
+  position: relative;
+}
+.abox.gold { background: rgba(193,127,36,0.12); border-color: rgba(193,127,36,0.35); }
+.abox.teal { background: rgba(13,115,119,0.12); border-color: rgba(13,115,119,0.35); }
+.abox.dim { background: rgba(255,255,255,0.03); border-style: dashed; }
+.abox-label { font-family: 'DM Mono', monospace; font-size: 9px; color: rgba(255,255,255,0.3); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px; }
+.abox-name { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.85); }
+.abox-name.gold { color: var(--gold-bright); }
+.abox-name.teal { color: #4EC9C6; }
+.arch-arrow { text-align: center; font-size: 16px; color: rgba(255,255,255,0.2); padding: 4px 0; margin-left: 92px; }
+
+/* FLOW STEPS */
+.flow-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 1px; background: var(--border); border-radius: 14px; overflow: hidden; box-shadow: var(--shadow-sm); }
+.flow-step { background: var(--surface); padding: 28px 22px; }
+.flow-num { font-family: 'Playfair Display', serif; font-size: 44px; font-weight: 900; color: var(--border); line-height: 1; margin-bottom: 14px; }
+.flow-title { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
+.flow-body { font-size: 12px; color: var(--ink3); line-height: 1.65; }
+
+/* SCHEMA */
+.db-schema { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px,1fr)); gap: 16px; margin-bottom: 40px; }
+.db-table { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; box-shadow: var(--shadow-sm); }
+.db-head {
+  background: var(--gold-light); border-bottom: 1px solid var(--gold-mid);
+  padding: 14px 18px; display: flex; align-items: center; gap: 8px;
+}
+.db-head-icon { font-size: 14px; }
+.db-head-name { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; color: var(--gold); letter-spacing: 0.06em; }
+.db-field { display: flex; align-items: center; justify-content: space-between; padding: 9px 18px; border-bottom: 1px solid var(--border); }
+.db-field:last-child { border-bottom: none; }
+.db-field-name { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--ink2); }
+.db-field-name.pk { color: var(--gold); font-weight: 500; }
+.db-field-name.fk { color: var(--teal); }
+.db-type { font-family: 'DM Mono', monospace; font-size: 10px; background: var(--bg); color: var(--ink4); padding: 2px 8px; border-radius: 4px; border: 1px solid var(--border); }
+
+/* INFO CARDS */
+.info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap: 14px; }
+.ic {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 24px;
+  box-shadow: var(--shadow-sm); display: flex; gap: 16px;
+}
+.ic-icon-wrap {
+  width: 44px; height: 44px; border-radius: 10px; background: var(--gold-light);
+  display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;
+}
+.ic-title { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
+.ic-body { font-size: 12px; color: var(--ink3); line-height: 1.65; }
+
+/* COMPARISON STRIP */
+.vs-strip {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 2px;
+  background: var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 40px;
+}
+.vs-side { padding: 28px 26px; background: var(--surface); }
+.vs-side.dark { background: var(--ink); }
+.vs-label { font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 12px; }
+.vs-label.light { color: var(--ink4); }
+.vs-label.accent { color: var(--gold-bright); }
+.vs-text { font-size: 13px; line-height: 1.7; }
+.vs-text.light { color: var(--ink2); }
+.vs-text.dark { color: rgba(255,255,255,0.6); }
+
+@media(max-width:700px){
+  .arch-canvas { padding: 20px 16px; }
+  .arch-row-label { display: none; }
+  .vs-strip { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo"><div class="logo-badge">E</div><span class="nav-wordmark">EARS</span></a>
+  <div class="nav-links">
+    <a href="index.html">Overview</a><a href="architecture.html" class="active">Architecture</a>
+    <a href="features.html">Features</a><a href="code.html">Code</a>
+    <a href="ai-vs-polish.html">AI vs Polish</a><a href="references.html">References</a>
+    <a href="https://earsystem.netlify.app/" target="_blank" class="nav-live">↗ Live Demo</a>
+  </div>
+  <button class="nav-burger" id="burger"><span></span><span></span><span></span></button>
+</nav>
+<div class="nav-drawer" id="drawer">
+  <a href="index.html" class="drawer-lnk">Overview</a><a href="architecture.html" class="drawer-lnk">Architecture</a>
+  <a href="features.html" class="drawer-lnk">Features</a><a href="code.html" class="drawer-lnk">Code</a>
+  <a href="ai-vs-polish.html" class="drawer-lnk">AI vs Polish</a><a href="references.html" class="drawer-lnk">References</a>
+  <a href="https://earsystem.netlify.app/" target="_blank">↗ Live Demo</a>
+</div>
+
+<div class="page-hero">
+  <div class="ph-inner reveal">
+    <div class="ph-tag">System Architecture</div>
+    <h1 class="ph-h1">How EARS is<br><em>put together</em></h1>
+    <p class="ph-desc">A single-origin, fully client-side application with no build step and no server dependency — designed for longevity and clean handoff.</p>
+  </div>
+</div>
+
+<section class="sec sec-alt">
+  <div class="sec-inner">
+    <div class="reveal">
+      <div class="eyebrow">The big picture</div>
+      <h2>Layered <em>client</em> architecture</h2>
+      <p class="sec-lead">Every layer lives in the browser. The server serves static files — all logic, storage and caching is client-side.</p>
+    </div>
+    <div class="arch-canvas reveal">
+      <div class="arch-layer">
+        <div class="arch-row-label">UI Layer</div>
+        <div class="arch-boxes">
+          <div class="abox gold"><div class="abox-label">Markup</div><div class="abox-name gold">index.html</div></div>
+          <div class="abox gold"><div class="abox-label">Presentation</div><div class="abox-name gold">Inline CSS</div></div>
+          <div class="abox gold"><div class="abox-label">Application Logic</div><div class="abox-name gold">script.js</div></div>
+        </div>
+      </div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-layer">
+        <div class="arch-row-label">App Layer</div>
+        <div class="arch-boxes">
+          <div class="abox teal"><div class="abox-label">Auth</div><div class="abox-name teal">Session + Validation</div></div>
+          <div class="abox teal"><div class="abox-label">Data</div><div class="abox-name teal">DB Object (localStorage)</div></div>
+          <div class="abox teal"><div class="abox-label">Render</div><div class="abox-name teal">Dynamic DOM updates</div></div>
+        </div>
+      </div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-layer">
+        <div class="arch-row-label">PWA Layer</div>
+        <div class="arch-boxes">
+          <div class="abox"><div class="abox-label">Offline Worker</div><div class="abox-name">Service Worker (sw.js)</div></div>
+          <div class="abox"><div class="abox-label">Install Manifest</div><div class="abox-name">manifest.json</div></div>
+          <div class="abox"><div class="abox-label">Asset Store</div><div class="abox-name">Cache API (ears-v2)</div></div>
+        </div>
+      </div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-layer">
+        <div class="arch-row-label">Future</div>
+        <div class="arch-boxes">
+          <div class="abox dim"><div class="abox-label">External Sync</div><div class="abox-name" style="color:rgba(255,255,255,0.4);">Google Sheets Apps Script</div></div>
+          <div class="abox dim"><div class="abox-label">Hosting</div><div class="abox-name" style="color:rgba(255,255,255,0.4);">Netlify CDN</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="flow-steps reveal">
+      <div class="flow-step"><div class="flow-num">01</div><div class="flow-title">Browser loads static files</div><div class="flow-body">Netlify serves index.html, script.js, manifest.json and sw.js — no server-side rendering, no API calls on page load.</div></div>
+      <div class="flow-step"><div class="flow-num">02</div><div class="flow-title">Service Worker installs</div><div class="flow-body">sw.js pre-caches all critical assets to the Cache API under key "ears-v2" — atomic install before activation.</div></div>
+      <div class="flow-step"><div class="flow-num">03</div><div class="flow-title">boot() initialises the app</div><div class="flow-body">Seeds demo data if first run, restores any active session, and routes user to the correct view based on role.</div></div>
+      <div class="flow-step"><div class="flow-num">04</div><div class="flow-title">All state in localStorage</div><div class="flow-body">The DB object wraps localStorage with typed helpers. Users, activities, audit logs and sessions persist across sessions.</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="sec-inner">
+    <div class="reveal">
+      <div class="eyebrow">Data layer</div>
+      <h2>Schema <em>design</em></h2>
+      <p class="sec-lead">Three logical tables stored as JSON arrays in localStorage — structured for future database migration.</p>
+    </div>
+    <div class="db-schema reveal">
+      <div class="db-table">
+        <div class="db-head"><span class="db-head-icon">👤</span><span class="db-head-name">users [ ]</span></div>
+        <div class="db-field"><span class="db-field-name pk">id</span><span class="db-type">integer PK</span></div>
+        <div class="db-field"><span class="db-field-name">name</span><span class="db-type">string</span></div>
+        <div class="db-field"><span class="db-field-name">email</span><span class="db-type">string (unique)</span></div>
+        <div class="db-field"><span class="db-field-name">password</span><span class="db-type">validated string</span></div>
+        <div class="db-field"><span class="db-field-name">role</span><span class="db-type">"admin"</span></div>
+        <div class="db-field"><span class="db-field-name">active</span><span class="db-type">boolean</span></div>
+        <div class="db-field"><span class="db-field-name">createdAt</span><span class="db-type">ISO 8601</span></div>
+      </div>
+      <div class="db-table">
+        <div class="db-head"><span class="db-head-icon">📋</span><span class="db-head-name">activities [ ]</span></div>
+        <div class="db-field"><span class="db-field-name pk">id</span><span class="db-type">integer PK</span></div>
+        <div class="db-field"><span class="db-field-name fk">userId</span><span class="db-type">FK → users</span></div>
+        <div class="db-field"><span class="db-field-name">title</span><span class="db-type">string</span></div>
+        <div class="db-field"><span class="db-field-name">type</span><span class="db-type">enum (8 types)</span></div>
+        <div class="db-field"><span class="db-field-name">date / time</span><span class="db-type">ISO string</span></div>
+        <div class="db-field"><span class="db-field-name">hours</span><span class="db-type">float</span></div>
+        <div class="db-field"><span class="db-field-name">status</span><span class="db-type">pending | approved</span></div>
+      </div>
+      <div class="db-table">
+        <div class="db-head"><span class="db-head-icon">🔍</span><span class="db-head-name">audit [ ]</span></div>
+        <div class="db-field"><span class="db-field-name pk">id</span><span class="db-type">integer PK</span></div>
+        <div class="db-field"><span class="db-field-name">at</span><span class="db-type">ISO 8601</span></div>
+        <div class="db-field"><span class="db-field-name">actor</span><span class="db-type">email string</span></div>
+        <div class="db-field"><span class="db-field-name">action</span><span class="db-type">string</span></div>
+        <div class="db-field"><span class="db-field-name">details</span><span class="db-type">string</span></div>
+        <div class="db-field" style="background:var(--gold-light);"><span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);">Cap: 200 entries</span><span></span></div>
+      </div>
+    </div>
+    <div class="info-grid reveal">
+      <div class="ic"><div class="ic-icon-wrap">🔄</div><div><div class="ic-title">Migration-ready design</div><div class="ic-body">All data access routes through the DB helper object. Swapping to Supabase or a REST API means updating only that one object — the rest of the app is untouched.</div></div></div>
+      <div class="ic"><div class="ic-icon-wrap">🔑</div><div><div class="ic-title">Auto-incrementing IDs</div><div class="ic-body">DB.nextId(key) manages its own counter per collection — mimics a database SERIAL sequence with zero dependencies.</div></div></div>
+      <div class="ic"><div class="ic-icon-wrap">📋</div><div><div class="ic-title">Audit log (capped)</div><div class="ic-body">Every action is logged — capped at 200 entries automatically to prevent localStorage overflow.</div></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec sec-alt">
+  <div class="sec-inner">
+    <div class="reveal">
+      <div class="eyebrow">Design decision</div>
+      <h2>Why <em>no</em> framework?</h2>
+    </div>
+    <div class="vs-strip reveal">
+      <div class="vs-side">
+        <div class="vs-label light">With a framework</div>
+        <div class="vs-text light">500KB+ runtime bundle · Build chain required · npm install before anything works · Dependency security surface · Framework version lock-in · Requires Node.js environment</div>
+      </div>
+      <div class="vs-side dark">
+        <div class="vs-label accent">Vanilla — what we chose</div>
+        <div class="vs-text dark">Loads in &lt;50ms · Edit and save — no build step · Zero dependencies · 100/100 Lighthouse performance · Works on any web server · Handoff with no setup friction</div>
+      </div>
+    </div>
+    <div class="info-grid reveal">
+      <div class="ic"><div class="ic-icon-wrap">⚡</div><div><div class="ic-title">Zero build chain</div><div class="ic-body">Any developer with a text editor can pick it up and run it immediately — the entire codebase is edit-and-save.</div></div></div>
+      <div class="ic"><div class="ic-icon-wrap">♾️</div><div><div class="ic-title">Expandable by design</div><div class="ic-body">The DB layer, sync module, and auth functions are designed as seams — any piece can be swapped independently.</div></div></div>
+      <div class="ic"><div class="ic-icon-wrap">🌐</div><div><div class="ic-title">Deploys everywhere</div><div class="ic-body">Static files deploy to Netlify, GitHub Pages, S3 or any web server. No runtime, no database. Infrastructure cost: $0.</div></div></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="f-logo"><div class="f-logo-badge">E</div><span class="f-wordmark">EARS</span></div>
+  <div class="f-meta">ISYS3002 · Curtin University · 2026</div>
+  <div class="f-links"><a href="index.html">Overview</a><a href="features.html">Features</a><a href="code.html">Code</a><a href="references.html">References</a></div>
+</footer>
+<script>
+const io=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target);}}),{threshold:.07});
+document.querySelectorAll('.reveal,.reveal-left,.reveal-right').forEach(el=>io.observe(el));
+const burger=document.getElementById('burger'),drawer=document.getElementById('drawer');
+burger.addEventListener('click',()=>{burger.classList.toggle('open');drawer.classList.toggle('open');});
+document.querySelectorAll('.drawer-lnk').forEach(a=>a.addEventListener('click',()=>{burger.classList.remove('open');drawer.classList.remove('open');}));
+</script>
+</body>
+</html>
